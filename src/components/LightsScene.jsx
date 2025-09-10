@@ -1,6 +1,7 @@
 import { Canvas } from '@react-three/fiber'
 import { OrbitControls } from '@react-three/drei'
 import { useRef, forwardRef, useImperativeHandle, useState } from 'react'
+import RayVisualizer from './RayVisualizer'
 
 // Preload audio outside component to avoid re-creation
 let clickAudio = null
@@ -12,7 +13,7 @@ try {
     console.warn('Could not preload audio:', error)
 }
 
-const Bulb = forwardRef(({ id, position, onToggle }, ref) => {
+const Bulb = forwardRef(({ id, position, onToggle, isPointed = false }, ref) => {
     const [on, setOn] = useState(false)
     const meshRef = useRef()
 
@@ -20,6 +21,7 @@ const Bulb = forwardRef(({ id, position, onToggle }, ref) => {
         try {
             if (clickAudio) {
                 clickAudio.currentTime = 0
+                console.log('Playing sound for bulb', id)
                 await clickAudio.play()
             }
         } catch (error) {
@@ -44,7 +46,8 @@ const Bulb = forwardRef(({ id, position, onToggle }, ref) => {
             })
         },
         id,
-        mesh: meshRef.current
+        mesh: meshRef.current,
+        isOn: on
     }))
 
     return (
@@ -64,18 +67,37 @@ const Bulb = forwardRef(({ id, position, onToggle }, ref) => {
             <sphereGeometry args={[0.2, 32, 32]} />
             <meshStandardMaterial
                 color={on ? '#ffeb3b' : '#ffffff'}
-                emissive={on ? '#ffeb3b' : '#000000'}
-                emissiveIntensity={on ? 0.8 : 0}
+                emissive={on ? '#ffeb3b' : isPointed ? '#00ff00' : '#000000'}
+                emissiveIntensity={on ? 0.8 : isPointed ? 0.3 : 0}
                 roughness={0.1}
                 metalness={0.1}
             />
+
+            {/* Outline effect when pointed at */}
+            {isPointed && !on && (
+                <mesh scale={[1.1, 1.1, 1.1]}>
+                    <sphereGeometry args={[0.2, 32, 32]} />
+                    <meshBasicMaterial
+                        color="#00ff00"
+                        transparent
+                        opacity={0.2}
+                        side={2} // THREE.DoubleSide
+                    />
+                </mesh>
+            )}
         </mesh>
     )
 })
 
 Bulb.displayName = 'Bulb'
 
-export default function LightsScene({ bulbRefs, onCameraReady }) {
+export default function LightsScene({
+    bulbRefs,
+    onCameraReady,
+    pointedBulbId = null,
+    fingerPosition = null,
+    pointing = false
+}) {
     const handleBulbToggle = (bulbId) => {
         console.log(`Bulb ${bulbId} toggled`)
     }
@@ -117,6 +139,7 @@ export default function LightsScene({ bulbRefs, onCameraReady }) {
                     key={index}
                     id={index + 1}
                     position={position}
+                    isPointed={pointedBulbId === index + 1}
                     ref={(el) => {
                         if (bulbRefs && bulbRefs.current) {
                             bulbRefs.current[index] = el
@@ -125,6 +148,16 @@ export default function LightsScene({ bulbRefs, onCameraReady }) {
                     onToggle={handleBulbToggle}
                 />
             ))}
+
+            {/* Ray visualization - inside Canvas */}
+            {fingerPosition && (
+                <RayVisualizer
+                    fingerPosition={fingerPosition}
+                    visible={true}
+                    color={pointing ? 0x00ff00 : 0xff0000}
+                    length={5}
+                />
+            )}
 
             {/* Ground plane */}
             <mesh

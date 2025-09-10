@@ -2,6 +2,7 @@ import { useRef } from 'react'
 import LightsScene from './components/LightsScene'
 import HandOverlay from './components/HandOverlay'
 import useHandPython from './hooks/useHandPython'
+import useRaycasting from './hooks/useRaycasting'
 
 function App() {
   const bulbRefs = useRef([])
@@ -9,6 +10,13 @@ function App() {
 
   // Connect to Python backend for hand tracking
   const { landmarks, connectionStatus, error, frameCount, reconnect } = useHandPython()
+
+  // Ray casting logic
+  const { hitInfo, pointing, fingerPosition } = useRaycasting(
+    cameraRef.current,
+    landmarks,
+    bulbRefs
+  )
 
   const handleCameraReady = (camera) => {
     cameraRef.current = camera
@@ -20,6 +28,9 @@ function App() {
       <LightsScene
         bulbRefs={bulbRefs}
         onCameraReady={handleCameraReady}
+        pointedBulbId={hitInfo?.bulbId || null}
+        fingerPosition={fingerPosition}
+        pointing={pointing}
       />
 
       {/* Hand tracking visualization */}
@@ -40,12 +51,12 @@ function App() {
         fontFamily: 'monospace',
         fontSize: '12px',
         zIndex: 1000,
-        minWidth: '250px'
+        minWidth: '280px'
       }}>
         <div style={{ color: '#ffeb3b', fontWeight: 'bold', marginBottom: '8px' }}>
-          DAY 2: Hand Tracking Integration
+          DAY 3: Ray Casting & Intersection
         </div>
-        <div>Click bulbs to toggle them!</div>
+        <div>Point at bulbs to highlight them!</div>
         <div>Camera: {cameraRef.current ? '✅ Ready' : '⏳ Loading...'}</div>
         <div>Bulbs: {bulbRefs.current?.length || 0}/3 loaded</div>
 
@@ -59,6 +70,22 @@ function App() {
 
         <div>Hand Detected: {landmarks ? '✅ Yes' : '❌ No'}</div>
         <div>Frames: {frameCount}</div>
+
+        <hr style={{ margin: '8px 0', borderColor: '#444' }} />
+
+        <div style={{ color: '#00ff00', fontWeight: 'bold' }}>Raycasting:</div>
+        <div>Pointing: {pointing ? '🎯 Yes' : '👆 No'}</div>
+        {hitInfo && (
+          <>
+            <div>Target: Bulb {hitInfo.bulbId}</div>
+            <div>Distance: {hitInfo.distance?.toFixed(2)}m</div>
+          </>
+        )}
+        {fingerPosition && (
+          <div style={{ fontSize: '11px', color: '#a0a0a0' }}>
+            Finger: ({fingerPosition.x.toFixed(3)}, {fingerPosition.y.toFixed(3)})
+          </div>
+        )}
 
         {error && (
           <div style={{ color: '#ef4444', marginTop: '4px' }}>
@@ -82,12 +109,6 @@ function App() {
           >
             🔄 Reconnect
           </button>
-        )}
-
-        {landmarks && (
-          <div style={{ marginTop: '8px', fontSize: '11px', color: '#a0a0a0' }}>
-            Fingertip: ({landmarks[8]?.x.toFixed(3)}, {landmarks[8]?.y.toFixed(3)})
-          </div>
         )}
       </div>
     </div>
