@@ -1,8 +1,9 @@
-import { useRef } from 'react'
+import { useRef, useEffect } from 'react'
 import LightsScene from './components/LightsScene'
 import HandOverlay from './components/HandOverlay'
 import useHandPython from './hooks/useHandPython'
 import useRaycasting from './hooks/useRaycasting'
+import usePinchDetection from './hooks/usePinchDetection'
 
 function App() {
   const bulbRefs = useRef([])
@@ -17,6 +18,26 @@ function App() {
     landmarks,
     bulbRefs
   )
+
+  // Pinch detection for bulb toggling
+  const { isPinching, pinchStrength, onPinch } = usePinchDetection(landmarks)
+
+  // Handle pinch events to toggle bulbs
+  useEffect(() => {
+    onPinch((pinchEvent) => {
+      if (pinchEvent.type === 'pinch_start' && hitInfo) {
+        // Toggle the bulb that's being pointed at
+        const targetBulb = bulbRefs.current.find(bulbRef =>
+          bulbRef && bulbRef.id === hitInfo.bulbId
+        )
+
+        if (targetBulb && targetBulb.toggle) {
+          console.log(`🔄 Toggling bulb ${hitInfo.bulbId} via pinch gesture`)
+          targetBulb.toggle()
+        }
+      }
+    })
+  }, [onPinch, hitInfo])
 
   const handleCameraReady = (camera) => {
     cameraRef.current = camera
@@ -54,9 +75,9 @@ function App() {
         minWidth: '280px'
       }}>
         <div style={{ color: '#ffeb3b', fontWeight: 'bold', marginBottom: '8px' }}>
-          DAY 3: Ray Casting & Intersection
+          DAY 4: Pinch Gesture Toggle
         </div>
-        <div>Point at bulbs to highlight them!</div>
+        <div>Point at bulbs and pinch to toggle them!</div>
         <div>Camera: {cameraRef.current ? '✅ Ready' : '⏳ Loading...'}</div>
         <div>Bulbs: {bulbRefs.current?.length || 0}/3 loaded</div>
 
@@ -81,6 +102,21 @@ function App() {
             <div>Distance: {hitInfo.distance?.toFixed(2)}m</div>
           </>
         )}
+
+        <hr style={{ margin: '8px 0', borderColor: '#444' }} />
+
+        <div style={{ color: '#ff6b6b', fontWeight: 'bold' }}>Pinch Detection:</div>
+        <div>Pinching: {isPinching ? '🤏 Yes' : '✋ No'}</div>
+        <div>Strength: {(pinchStrength * 100).toFixed(0)}%</div>
+        {isPinching && hitInfo && (
+          <div style={{ color: '#22c55e' }}>Ready to toggle bulb {hitInfo.bulbId}!</div>
+        )}
+        {fingerPosition && (
+          <div style={{ fontSize: '11px', color: '#a0a0a0' }}>
+            Finger: ({fingerPosition.x.toFixed(3)}, {fingerPosition.y.toFixed(3)})
+          </div>
+        )}
+
         {fingerPosition && (
           <div style={{ fontSize: '11px', color: '#a0a0a0' }}>
             Finger: ({fingerPosition.x.toFixed(3)}, {fingerPosition.y.toFixed(3)})
