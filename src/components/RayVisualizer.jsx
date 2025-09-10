@@ -83,9 +83,10 @@ export default function RayVisualizer({
 
         try {
             // Convert screen coordinates to world ray
+            // Note: Flip X coordinate to correct camera mirroring
             const mouse = new THREE.Vector2(
-                fingerPosition.x * 2 - 1,
-                -fingerPosition.y * 2 + 1
+                -(fingerPosition.x * 2 - 1),  // Flip X to correct mirroring
+                -fingerPosition.y * 2 + 1     // Keep Y as is
             )
 
             const raycaster = new THREE.Raycaster()
@@ -93,7 +94,9 @@ export default function RayVisualizer({
 
             // Find intersection with scene objects
             const sceneObjects = getSceneObjects()
-            const intersection = findSceneIntersection(camera, fingerPosition.x, fingerPosition.y, sceneObjects)
+            // Use corrected coordinates for intersection (flip X)
+            const correctedX = 1 - fingerPosition.x  // Flip X coordinate
+            const intersection = findSceneIntersection(camera, correctedX, fingerPosition.y, sceneObjects)
 
             if (intersection) {
                 // Show intersection dot at hit point

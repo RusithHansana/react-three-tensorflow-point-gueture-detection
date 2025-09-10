@@ -44,9 +44,10 @@ export default function useRaycasting(camera, landmarks, bulbRefs) {
         }
 
         // Perform intersection test
+        // Flip X coordinate to correct camera mirroring
         const intersection = findIntersectedBulb(
             camera,
-            fingerTip.x,
+            1 - fingerTip.x,  // Flip X coordinate 
             fingerTip.y,
             bulbMeshes
         )
