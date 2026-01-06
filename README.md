@@ -2,7 +2,7 @@
 
 ![React](https://img.shields.io/badge/React-19.1.1-61DAFB?style=for-the-badge&logo=react&logoColor=white)
 ![Three.js](https://img.shields.io/badge/Three.js-R166-000000?style=for-the-badge&logo=three.js&logoColor=white)
-![Python](https://img.shields.io/badge/Python-3.11-3776AB?style=for-the-badge&logo=python&logoColor=white)
+![Python](https://img.shields.io/badge/Python-3.8+-3776AB?style=for-the-badge&logo=python&logoColor=white)
 ![MediaPipe](https://img.shields.io/badge/MediaPipe-0.10.5-FF6B35?style=for-the-badge&logo=google&logoColor=white)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.104.1-009688?style=for-the-badge&logo=fastapi&logoColor=white)
 
@@ -78,8 +78,17 @@ npm run dev
 # Navigate to backend directory
 cd backend
 
+# Create virtual environment (recommended)
+python -m venv venv
+
+# Activate virtual environment
+# Windows:
+venv\Scripts\activate
+# Linux/Mac:
+# source venv/bin/activate
+
 # Install Python dependencies
-pip install fastapi uvicorn opencv-python mediapipe websockets
+pip install -r requirements.txt
 
 # Start the hand tracking server
 python server.py
@@ -93,7 +102,7 @@ python server.py
 ## 📁 Project Structure
 
 ```
-react-three-tensorflow-point-gueture-detection/
+gesture-control-react-three/
 ├── src/
 │   ├── components/
 │   │   ├── LightsScene.jsx          # Main 3D scene with bulbs
@@ -113,7 +122,8 @@ react-three-tensorflow-point-gueture-detection/
 │   │   └── raycastUtils.js          # Ray casting utilities
 │   └── App.jsx                      # Main application component
 ├── backend/
-│   └── server.py                    # MediaPipe hand tracking server
+│   ├── server.py                    # MediaPipe hand tracking server
+│   └── requirements.txt             # Python dependencies
 ├── public/                          # Static assets
 └── package.json                     # Project dependencies
 ```
@@ -158,7 +168,7 @@ Webcam Input → MediaPipe → Hand Landmarks → WebSocket → React Frontend
 
 ### **Backend Technologies**
 
-- **Python 3.11** - Backend runtime
+- **Python 3.8+** - Backend runtime
 - **FastAPI** - Modern web framework for APIs
 - **MediaPipe** - Google's machine learning framework
 - **OpenCV** - Computer vision library
@@ -292,7 +302,10 @@ const PARTICLE_SIZE = 0.004;
 
 **Build errors:**
 
-- Clear node_modules and reinstall: `rm -rf node_modules && npm install`
+- Clear node_modules and reinstall:
+  - Windows (PowerShell): `Remove-Item -Recurse -Force node_modules; npm install`
+  - Windows (cmd): `rmdir /s /q node_modules && npm install`
+  - Linux/Mac: `rm -rf node_modules && npm install`
 - Check Node.js version compatibility
 - Verify all dependencies are properly installed
 
@@ -357,7 +370,5 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 <div align="center">
 
 **Built with ❤️ by the React Three.js Community**
-
-[🌟 Star this repo](https://github.com/RusithHansana/react-three-tensorflow-point-gueture-detection) • [🐛 Report Bug](https://github.com/RusithHansana/react-three-tensorflow-point-gueture-detection/issues) • [💡 Request Feature](https://github.com/RusithHansana/react-three-tensorflow-point-gueture-detection/issues)
 
 </div>
