@@ -8,6 +8,10 @@
 
 A cutting-edge **gesture-based 3D lighting control system** that detects hand pointing gestures and allows users to toggle smart bulbs in a realistic 3D environment using pinch gestures. Built with React Three.js frontend and Python MediaPipe backend.
 
+## Demo
+
+![Demo-Preview](https://github.com/user-attachments/assets/eda98879-f875-4f07-8af6-47d04c4f5ab3)
+
 ## 🌟 Features
 
 ### 🎮 **Core Functionality**
