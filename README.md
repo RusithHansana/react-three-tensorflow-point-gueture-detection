@@ -1,4 +1,4 @@
-# 🎯 React Three.js Hand Gesture Point Detection System
+# 🎯 HandCast - Hand Gesture Point Detection System
 
 ![React](https://img.shields.io/badge/React-19.1.1-61DAFB?style=for-the-badge&logo=react&logoColor=white)
 ![Three.js](https://img.shields.io/badge/Three.js-R166-000000?style=for-the-badge&logo=three.js&logoColor=white)
